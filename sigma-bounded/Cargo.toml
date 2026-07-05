@@ -1,14 +1,17 @@
 [package]
 name = "sigma-bounded"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 rust-version = "1.90.0"
 license = "MIT OR Apache-2.0"
 authors = ["Sigma Tactical Group contributors <https://github.com/sigmatactical-org>"]
 description = "Bounded Vec, String, and map types abstracting alloc vs heapless"
 repository = "https://github.com/sigmatactical-org/dbc-rs"
+homepage = "https://github.com/sigmatactical-org/dbc-rs"
+documentation = "https://docs.rs/sigma-bounded"
 readme = "README.md"
-publish = false
+keywords = ["no_std", "embedded", "heapless", "alloc"]
+categories = ["data-structures", "embedded"]
 
 [dependencies.heapless]
 version = "0.9.2"
