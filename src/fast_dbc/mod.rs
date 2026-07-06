@@ -303,6 +303,11 @@ impl FastDbc {
     /// Sign-extend a value.
     #[inline(always)]
     fn sign_extend(value: u64, bits: usize) -> i64 {
+        // A full-width 64-bit value is already its own two's-complement
+        // representation; `1u64 << 64` would be undefined behavior.
+        if bits >= 64 {
+            return value as i64;
+        }
         let sign_bit = 1u64 << (bits - 1);
         if (value & sign_bit) != 0 {
             let mask = !((1u64 << bits) - 1);

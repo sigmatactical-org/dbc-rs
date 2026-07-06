@@ -8,6 +8,20 @@ use crate::MAX_NAME_SIZE;
 use crate::compat::{Comment, String};
 
 impl Signal {
+    /// Number of payload bytes this signal actually spans, accounting for byte order.
+    ///
+    /// Uses the same physical bit-range logic as [`crate::Message::bit_range`], so
+    /// big-endian (Motorola) signals are bounded by their true byte span rather than
+    /// the little-endian forward span `(start_bit + length - 1) / 8`. This is required
+    /// to reject short payloads before indexing in `decode_raw` / `encode_to`.
+    #[inline]
+    pub(crate) fn required_len(&self) -> usize {
+        let (_lsb, msb) = crate::Message::bit_range(self.start_bit, self.length, self.byte_order);
+        (msb as usize / 8) + 1
+    }
+}
+
+impl Signal {
     #[cfg(feature = "std")]
     #[allow(clippy::too_many_arguments)] // Internal method, builder pattern is the public API
     pub(crate) fn new(

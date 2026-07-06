@@ -4,15 +4,15 @@ use crate::{ByteOrder, Signal};
 
 /// Pre-computed signal decode parameters.
 ///
-/// Packed for cache efficiency (20 bytes per signal).
+/// Packed for cache efficiency (fits in a single cache line per signal).
 #[derive(Clone, Copy)]
 pub(super) struct SignalDecode {
     /// Starting byte index in payload
     pub byte_start: u8,
     /// Bit offset within starting byte (0-7)
     pub bit_offset: u8,
-    /// Signal length in bits
-    pub length: u8,
+    /// Signal length in bits (up to the DBC max of 512, so must be 16-bit)
+    pub length: u16,
     /// Flags: bit 0 = unsigned, bit 1 = little_endian, bit 2 = identity_transform
     pub flags: u8,
     /// Scaling factor
@@ -61,7 +61,7 @@ impl SignalDecode {
         Self {
             byte_start: (start_bit / 8) as u8,
             bit_offset: (start_bit % 8) as u8,
-            length: length as u8,
+            length: length as u16,
             flags,
             factor: signal.factor(),
             offset: signal.offset(),

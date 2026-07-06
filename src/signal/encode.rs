@@ -36,6 +36,12 @@ impl Signal {
     /// ```
     #[inline]
     pub fn encode_raw(&self, physical_value: f64) -> Result<u64> {
+        // Reject NaN / infinity: these compare false against both bounds and would
+        // otherwise poison rounding and the downstream cast.
+        if !physical_value.is_finite() {
+            return Err(Error::Encoding(Error::ENCODING_VALUE_OUT_OF_RANGE));
+        }
+
         // Validate value is within min/max range
         if physical_value < self.min || physical_value > self.max {
             return Err(Error::Encoding(Error::ENCODING_VALUE_OUT_OF_RANGE));
@@ -71,10 +77,15 @@ impl Signal {
             raw_unsigned
         } else {
             // Signed: use two's complement encoding
-            // Check if value fits in signed range for this bit length
-            let half_range = 1i64 << (self.length - 1);
-            let min_signed = -half_range;
-            let max_signed = half_range - 1;
+            // Check if value fits in signed range for this bit length.
+            // For a full-width 64-bit signal `1i64 << 63` is i64::MIN, and negating
+            // it would overflow, so use the natural i64 bounds directly.
+            let (min_signed, max_signed) = if self.length >= 64 {
+                (i64::MIN, i64::MAX)
+            } else {
+                let half_range = 1i64 << (self.length - 1);
+                (-half_range, half_range - 1)
+            };
 
             if raw_signed < min_signed || raw_signed > max_signed {
                 return Err(Error::Encoding(Error::ENCODING_VALUE_OVERFLOW));
@@ -117,9 +128,10 @@ impl Signal {
     pub fn encode_to(&self, physical_value: f64, payload: &mut [u8]) -> Result<()> {
         let start_bit = self.start_bit as usize;
         let length = self.length as usize;
-        let end_byte = (start_bit + length - 1) / 8;
 
-        if end_byte >= payload.len() {
+        // Byte-order-aware span check (see `decode_raw`): big-endian signals must be
+        // bounded by their true physical span, not the little-endian forward span.
+        if self.required_len() > payload.len() {
             return Err(Error::Encoding(Error::SIGNAL_EXTENDS_BEYOND_DATA));
         }
 
