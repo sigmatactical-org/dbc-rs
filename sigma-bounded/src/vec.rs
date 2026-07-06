@@ -104,9 +104,7 @@ impl<T, const N: usize> Vec<T, N> {
         }
         #[cfg(not(feature = "alloc"))]
         {
-            self.0
-                .extend_from_slice(other)
-                .map_err(|_| Error::CapacityExceeded)
+            self.0.extend_from_slice(other).map_err(|_| Error::CapacityExceeded)
         }
     }
 

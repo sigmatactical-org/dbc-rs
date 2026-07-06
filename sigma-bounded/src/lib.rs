@@ -4,7 +4,11 @@
 //! **`heapless`** (`default-features = false`) so firmware policy matches **`dbc-rs`** without
 //! duplicating collection wrappers elsewhere.
 
-#![cfg_attr(not(feature = "alloc"), no_std)]
+// Embedded-first: always `no_std`. `alloc`-backed collections pull in the
+// `alloc` crate below; the `heapless` backend needs neither `std` nor `alloc`.
+// (Previously this was `no_std` only in the non-`alloc` build, which made the
+// `alloc` feature silently require `std` and broke bare-metal targets.)
+#![no_std]
 #![forbid(unsafe_code)]
 
 #[cfg(all(not(feature = "alloc"), not(feature = "heapless")))]

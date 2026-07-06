@@ -84,9 +84,7 @@ where
         }
         #[cfg(not(feature = "alloc"))]
         {
-            self.0
-                .insert(key, value)
-                .map_err(|_| Error::CapacityExceeded)
+            self.0.insert(key, value).map_err(|_| Error::CapacityExceeded)
         }
     }
 

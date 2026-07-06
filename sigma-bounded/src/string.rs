@@ -37,9 +37,7 @@ impl<const N: usize> String<N> {
         }
         #[cfg(not(feature = "alloc"))]
         {
-            Inner::from_utf8(vec.into_inner())
-                .map(Self)
-                .map_err(|_| Error::InvalidUtf8)
+            Inner::from_utf8(vec.into_inner()).map(Self).map_err(|_| Error::InvalidUtf8)
         }
     }
 
@@ -109,9 +107,7 @@ impl<'a, const N: usize> TryFrom<&'a str> for String<N> {
         }
         #[cfg(not(feature = "alloc"))]
         {
-            Inner::try_from(s)
-                .map(Self)
-                .map_err(|_| Error::CapacityExceeded)
+            Inner::try_from(s).map(Self).map_err(|_| Error::CapacityExceeded)
         }
     }
 }
