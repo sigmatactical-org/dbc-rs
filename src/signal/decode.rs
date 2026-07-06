@@ -77,10 +77,9 @@ mod tests {
         // little-endian span heuristic `(start_bit + length - 1)/8` would compute
         // byte 4 and wrongly accept a 3-byte frame; the byte-order-aware span must
         // reject it instead of indexing out of bounds.
-        let signal = Signal::parse(
-            &mut Parser::new(b"SG_ BeSig : 23|16@0+ (1,0) [0|65535] \"\"").unwrap(),
-        )
-        .unwrap();
+        let signal =
+            Signal::parse(&mut Parser::new(b"SG_ BeSig : 23|16@0+ (1,0) [0|65535] \"\"").unwrap())
+                .unwrap();
         let short = [0x00, 0x00, 0x00];
         assert!(signal.decode_raw(&short).is_err());
         let ok = [0x00, 0x00, 0x12, 0x34];
@@ -90,10 +89,9 @@ mod tests {
     #[test]
     fn test_decode_signed_64bit_no_shift_ub() {
         // Full-width 64-bit signed signal must not evaluate `1u64 << 64`.
-        let signal = Signal::parse(
-            &mut Parser::new(b"SG_ Big : 0|64@1- (1,0) [-1|1] \"\"").unwrap(),
-        )
-        .unwrap();
+        let signal =
+            Signal::parse(&mut Parser::new(b"SG_ Big : 0|64@1- (1,0) [-1|1] \"\"").unwrap())
+                .unwrap();
         let data = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
         let (raw, _value) = signal.decode_raw(&data).unwrap();
         assert_eq!(raw, -1);
@@ -103,10 +101,9 @@ mod tests {
     fn test_decode_unsigned_64bit_physical_value() {
         // A 64-bit unsigned value with the MSB set must not be treated as negative
         // when computing the physical value.
-        let signal = Signal::parse(
-            &mut Parser::new(b"SG_ Big : 0|64@1+ (1,0) [0|1] \"\"").unwrap(),
-        )
-        .unwrap();
+        let signal =
+            Signal::parse(&mut Parser::new(b"SG_ Big : 0|64@1+ (1,0) [0|1] \"\"").unwrap())
+                .unwrap();
         let data = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80];
         let (_raw, value) = signal.decode_raw(&data).unwrap();
         assert_eq!(value, 9223372036854775808.0);
