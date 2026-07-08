@@ -6,7 +6,7 @@ impl Message {
     pub fn to_dbc_string(&self) -> std::string::String {
         format!(
             "BO_ {} {} : {} {}",
-            self.id(),
+            self.id_with_flag(),
             self.name(),
             self.dlc(),
             self.sender()
