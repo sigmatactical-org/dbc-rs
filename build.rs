@@ -60,25 +60,25 @@ fn main() {
     let max_signals = env::var("DBC_MAX_SIGNALS_PER_MESSAGE")
         .ok()
         .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(256); // Default to 256
+        .unwrap_or(8); // Default to 8 signals/message — embedded-sane; override for big DBCs
 
     // Allow override of MAX_MESSAGES via environment variable
     let max_messages = env::var("DBC_MAX_MESSAGES")
         .ok()
         .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(8192); // Default to 8192 (2^13, power of 2)
+        .unwrap_or(16); // Default to 16 messages — the 8192 default made Dbc gigabytes by value (issue #2)
 
     // Allow override of MAX_NODES via environment variable
     let max_nodes = env::var("DBC_MAX_NODES")
         .ok()
         .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(256); // Default to 256
+        .unwrap_or(8); // Default to 8 nodes
 
     // Allow override of MAX_VALUE_DESCRIPTIONS via environment variable
     let max_value_descriptions = env::var("DBC_MAX_VALUE_DESCRIPTIONS")
         .ok()
         .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(64); // Default to 64
+        .unwrap_or(16); // Default to 16 value descriptions per signal
 
     // Allow override of MAX_NAME_SIZE via environment variable
     let max_name_size = env::var("DBC_MAX_NAME_SIZE")
@@ -90,7 +90,7 @@ fn main() {
     let max_extended_multiplexing = env::var("DBC_MAX_EXTENDED_MULTIPLEXING")
         .ok()
         .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(512); // Default to 512 (power of 2, per-file limit for extended multiplexing entries)
+        .unwrap_or(16); // Default to 16 extended-multiplexing entries
 
     // Attribute limits (only when attributes feature is enabled)
     let (max_attribute_definitions, max_attribute_values, max_attribute_enum_values) =
@@ -98,12 +98,12 @@ fn main() {
             let max_attribute_definitions = env::var("DBC_MAX_ATTRIBUTE_DEFINITIONS")
                 .ok()
                 .and_then(|s| s.parse::<usize>().ok())
-                .unwrap_or(256);
+                .unwrap_or(32);
 
             let max_attribute_values = env::var("DBC_MAX_ATTRIBUTE_VALUES")
                 .ok()
                 .and_then(|s| s.parse::<usize>().ok())
-                .unwrap_or(4096);
+                .unwrap_or(16);
 
             let max_attribute_enum_values = env::var("DBC_MAX_ATTRIBUTE_ENUM_VALUES")
                 .ok()

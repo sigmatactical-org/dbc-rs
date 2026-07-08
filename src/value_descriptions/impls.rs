@@ -125,11 +125,11 @@ impl ValueDescriptions {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::MAX_NAME_SIZE;
+    use crate::{MAX_NAME_SIZE, MAX_VALUE_DESCRIPTIONS};
     use crate::compat::{String, Vec};
 
     fn create_test_entries() -> ValueDescEntries {
-        let mut entries: Vec<(u64, String<{ MAX_NAME_SIZE }>), 64> = Vec::new();
+        let mut entries: Vec<(u64, String<{ MAX_NAME_SIZE }>), { MAX_VALUE_DESCRIPTIONS }> = Vec::new();
         let _ = entries.push((0, String::try_from("Park").unwrap()));
         let _ = entries.push((1, String::try_from("Reverse").unwrap()));
         let _ = entries.push((2, String::try_from("Neutral").unwrap()));
@@ -181,7 +181,7 @@ mod tests {
     fn test_value_descriptions_iter() {
         let vd = ValueDescriptions::new(create_test_entries());
 
-        let mut collected: Vec<(u64, &str), 64> = Vec::new();
+        let mut collected: Vec<(u64, &str), { MAX_VALUE_DESCRIPTIONS }> = Vec::new();
         for item in vd.iter() {
             let _ = collected.push(item);
         }
@@ -197,7 +197,7 @@ mod tests {
         let empty_entries: ValueDescEntries = Vec::new();
         let vd = ValueDescriptions::new(empty_entries);
 
-        let mut collected: Vec<(u64, &str), 64> = Vec::new();
+        let mut collected: Vec<(u64, &str), { MAX_VALUE_DESCRIPTIONS }> = Vec::new();
         for item in vd.iter() {
             let _ = collected.push(item);
         }

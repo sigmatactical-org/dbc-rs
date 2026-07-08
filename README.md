@@ -63,7 +63,14 @@ let payload = dbc.encode(0x100, &[
 
 ```toml
 [dependencies]
-dbc-rs = { version = "0.5", default-features = false, features = ["heapless"] }
+dbc-rs = { version = "0.7", default-features = false, features = ["heapless"] }
+
+# heapless capacities are compile-time inline storage, sized for embedded
+# safety-bus DBCs by default (16 messages × 8 signals, 8 nodes …). For
+# larger DBCs either use the `alloc` feature or raise the caps at build
+# time via env vars: DBC_MAX_MESSAGES, DBC_MAX_SIGNALS_PER_MESSAGE,
+# DBC_MAX_NODES, DBC_MAX_VALUE_DESCRIPTIONS, DBC_MAX_NAME_SIZE,
+# DBC_MAX_EXTENDED_MULTIPLEXING (powers of 2 where required).
 ```
 
 See [`examples/`](./examples/) for complete working examples:
