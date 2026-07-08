@@ -257,14 +257,15 @@ BO_ {} Extended : 8 ECM
 
 #[test]
 fn test_max_nodes() {
-    // Test maximum number of nodes (256)
+    use dbc_rs::MAX_NODES;
+
     let mut dbc_str = String::from(
         r#"VERSION "1.0"
 
 BU_: "#,
     );
 
-    for i in 0..256 {
+    for i in 0..MAX_NODES {
         if i > 0 {
             dbc_str.push(' ');
         }
@@ -273,12 +274,13 @@ BU_: "#,
     dbc_str.push('\n');
 
     let dbc = Dbc::parse(&dbc_str).expect("Should accept max nodes");
-    assert_eq!(dbc.nodes().len(), 256);
+    assert_eq!(dbc.nodes().len(), MAX_NODES);
 }
 
 #[test]
 fn test_max_signals_per_message() {
-    // Test maximum signals per message (64)
+    use dbc_rs::MAX_SIGNALS_PER_MESSAGE;
+
     let mut dbc_str = String::from(
         r#"VERSION "1.0"
 
@@ -288,12 +290,15 @@ BO_ 256 Test : 8 ECM
 "#,
     );
 
-    for i in 0..64 {
+    for i in 0..MAX_SIGNALS_PER_MESSAGE {
         dbc_str.push_str(&format!(" SG_ Signal{} : {}|1@1+ (1,0) [0|1] \"\"\n", i, i));
     }
 
     let dbc = Dbc::parse(&dbc_str).expect("Should accept max signals per message");
-    assert_eq!(dbc.messages().at(0).unwrap().signals().len(), 64);
+    assert_eq!(
+        dbc.messages().at(0).unwrap().signals().len(),
+        MAX_SIGNALS_PER_MESSAGE
+    );
 }
 
 #[test]

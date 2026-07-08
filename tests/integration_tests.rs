@@ -567,6 +567,13 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG : 0 Vector__XXX
 
     #[test]
     fn test_parse_29_bit_odb2_dbc() {
+        use dbc_rs::MAX_SIGNALS_PER_MESSAGE;
+
+        // This fixture has 149 signals in one message; skip when built with embedded limits.
+        if MAX_SIGNALS_PER_MESSAGE < 149 {
+            return;
+        }
+
         // Integration test for 11-bit-odb2.dbc file
         // This file contains a standard 11-bit CAN ID (2024 = 0x7E8)
         // with OBD2 diagnostic data and extensive multiplexing (149 signals)

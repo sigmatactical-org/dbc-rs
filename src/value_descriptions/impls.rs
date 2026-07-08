@@ -125,11 +125,12 @@ impl ValueDescriptions {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{MAX_NAME_SIZE, MAX_VALUE_DESCRIPTIONS};
     use crate::compat::{String, Vec};
+    use crate::{MAX_NAME_SIZE, MAX_VALUE_DESCRIPTIONS};
 
     fn create_test_entries() -> ValueDescEntries {
-        let mut entries: Vec<(u64, String<{ MAX_NAME_SIZE }>), { MAX_VALUE_DESCRIPTIONS }> = Vec::new();
+        let mut entries: Vec<(u64, String<{ MAX_NAME_SIZE }>), { MAX_VALUE_DESCRIPTIONS }> =
+            Vec::new();
         let _ = entries.push((0, String::try_from("Park").unwrap()));
         let _ = entries.push((1, String::try_from("Reverse").unwrap()));
         let _ = entries.push((2, String::try_from("Neutral").unwrap()));

@@ -1,5 +1,5 @@
 use criterion::{Criterion, criterion_group, criterion_main};
-use dbc_rs::Dbc;
+use dbc_rs::{Dbc, MAX_MESSAGES, MAX_SIGNALS_PER_MESSAGE};
 use std::hint::black_box;
 
 fn bench_parse_small(c: &mut Criterion) {
@@ -26,8 +26,9 @@ BU_: ECM TCM BCM
 "#,
     );
 
-    // Add 50 messages
-    for i in 0..50 {
+    // Add half of MAX_MESSAGES for a medium-sized DBC
+    let medium_message_count = (MAX_MESSAGES / 2).max(1);
+    for i in 0..medium_message_count {
         medium_dbc.push_str(&format!("BO_ {} Message{} : 8 ECM\n", 256 + i, i));
         for j in 0..4 {
             medium_dbc.push_str(&format!(
@@ -52,10 +53,10 @@ BU_: ECM TCM BCM GATEWAY SENSOR ACTUATOR
 "#,
     );
 
-    // Add 200 messages
-    for i in 0..200 {
+    // Fill MAX_MESSAGES with MAX_SIGNALS_PER_MESSAGE signals each
+    for i in 0..MAX_MESSAGES {
         large_dbc.push_str(&format!("BO_ {} Message{} : 8 ECM\n", 256 + i, i));
-        for j in 0..8 {
+        for j in 0..MAX_SIGNALS_PER_MESSAGE {
             large_dbc.push_str(&format!(
                 " SG_ Signal{} : {}|8@1+ (1,0) [0|255] \"\"\n",
                 j,
@@ -142,8 +143,8 @@ BU_: ECM
 "#,
     );
 
-    // Create 100 messages to test lookup performance
-    for i in 0..100 {
+    // Create MAX_MESSAGES to test lookup performance
+    for i in 0..MAX_MESSAGES {
         dbc_content.push_str(&format!("BO_ {} Message{} : 8 ECM\n", 256 + i, i));
         dbc_content.push_str(" SG_ Signal : 0|8@1+ (1,0) [0|255] \"\"\n");
     }
@@ -165,15 +166,15 @@ BU_: ECM
 "#,
     );
 
-    // Create 100 messages to test lookup performance
-    for i in 0..100 {
+    // Create MAX_MESSAGES to test lookup performance
+    for i in 0..MAX_MESSAGES {
         dbc_content.push_str(&format!("BO_ {} Message{} : 8 ECM\n", 256 + i, i));
         dbc_content.push_str(" SG_ Signal : 0|8@1+ (1,0) [0|255] \"\"\n");
     }
 
     let dbc = Dbc::parse(&dbc_content).unwrap();
     let payload = [0x42; 8]; // All bytes set to 0x42
-    let middle_id = 256 + 50; // Middle message
+    let middle_id = (256 + (MAX_MESSAGES / 2)) as u32; // Middle message
 
     c.bench_function("decode_message_lookup_middle", |b| {
         b.iter(|| dbc.decode(black_box(middle_id), black_box(&payload), false))
@@ -189,15 +190,15 @@ BU_: ECM
 "#,
     );
 
-    // Create 100 messages to test lookup performance
-    for i in 0..100 {
+    // Create MAX_MESSAGES to test lookup performance
+    for i in 0..MAX_MESSAGES {
         dbc_content.push_str(&format!("BO_ {} Message{} : 8 ECM\n", 256 + i, i));
         dbc_content.push_str(" SG_ Signal : 0|8@1+ (1,0) [0|255] \"\"\n");
     }
 
     let dbc = Dbc::parse(&dbc_content).unwrap();
     let payload = [0x42; 8]; // All bytes set to 0x42
-    let last_id = 256 + 99; // Last message
+    let last_id = (256 + MAX_MESSAGES - 1) as u32; // Last message
 
     c.bench_function("decode_message_lookup_last", |b| {
         b.iter(|| dbc.decode(black_box(last_id), black_box(&payload), false))
@@ -213,8 +214,8 @@ BU_: ECM
 "#,
     );
 
-    // Create 50 messages for throughput test
-    for i in 0..50 {
+    // Create MAX_MESSAGES for throughput test
+    for i in 0..MAX_MESSAGES {
         dbc_content.push_str(&format!("BO_ {} Message{} : 8 ECM\n", 256 + i, i));
         dbc_content.push_str(" SG_ Signal0 : 0|8@1+ (1,0) [0|255] \"\"\n");
         dbc_content.push_str(" SG_ Signal1 : 8|8@1+ (1,0) [0|255] \"\"\n");
@@ -225,9 +226,9 @@ BU_: ECM
 
     c.bench_function("decode_high_throughput", |b| {
         b.iter(|| {
-            // Decode all 50 messages in sequence
-            for i in 0..50 {
-                black_box(dbc.decode(256 + i, &payload, false).unwrap());
+            // Decode all messages in sequence
+            for i in 0..MAX_MESSAGES {
+                black_box(dbc.decode(256 + i as u32, &payload, false).unwrap());
             }
         })
     });
