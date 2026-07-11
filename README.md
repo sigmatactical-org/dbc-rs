@@ -102,6 +102,12 @@ considered a minor breaking change and will be noted in release notes.
 - [SPECIFICATIONS.md](./SPECIFICATIONS.md) - DBC format reference
 - [SECURITY.md](./SECURITY.md) - Security audit
 
+## Brand & artwork
+
+© Sigma Tactical Group. **All rights reserved.**
+
+The Sigma Tactical Group name, logos, marks, artwork, and visual identity are **proprietary**. They are not covered by this repository's source-code license. See [BRANDING.md](BRANDING.md).
+
 ## License
 
 Licensed under either of:
