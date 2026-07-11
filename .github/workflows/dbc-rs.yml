@@ -183,7 +183,7 @@ jobs:
           BASELINE_NAME="ci-$(git rev-parse --short HEAD)"
           cargo bench --bench parse_bench --verbose -- --save-baseline "$BASELINE_NAME"
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: criterion-results-${{ github.ref_name == 'main' && 'main' || format('commit-{0}', github.sha) }}
