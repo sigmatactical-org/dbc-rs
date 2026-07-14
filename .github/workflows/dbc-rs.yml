@@ -1,4 +1,4 @@
-name: dbc-rs Library CI
+name: CI
 
 on:
   push:
