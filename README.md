@@ -8,7 +8,7 @@ Maintained by **[Sigma Tactical Group](https://github.com/sigmatactical-org)** f
 [![Crates.io](https://img.shields.io/crates/v/dbc-rs.svg)](https://crates.io/crates/dbc-rs)
 [![Documentation](https://docs.rs/dbc-rs/badge.svg)](https://docs.rs/dbc-rs)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
-[![MSRV](https://img.shields.io/badge/MSRV-1.92.0-blue.svg)](https://www.rust-lang.org)
+[![MSRV](https://img.shields.io/badge/MSRV-1.97.0-blue.svg)](https://www.rust-lang.org)
 
 ## Features
 
@@ -93,7 +93,7 @@ See [`examples/`](./examples/) for complete working examples:
 
 ## Minimum Supported Rust Version (MSRV)
 
-dbc-rs requires **Rust 1.92.0** or later (edition 2024). Bumping the MSRV is
+dbc-rs requires **Rust 1.97.0** or later (edition 2024). Bumping the MSRV is
 considered a minor breaking change and will be noted in release notes.
 
 ## Documentation

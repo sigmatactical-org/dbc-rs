@@ -79,7 +79,7 @@ impl Version {
         if self.version.is_empty() {
             format!("{} \"\"", VERSION)
         } else {
-            format!("{} \"{}\"", VERSION, &self.version)
+            format!("{} \"{}\"", VERSION, self.version)
         }
     }
 }
