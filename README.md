@@ -1,14 +1,14 @@
 # dbc-rs
 
-A lightweight Rust library for seamlessly parsing and editing DBC (CAN Database) files, with robust support for encoding and decoding messages and signals.
-
-Maintained by **[Sigma Tactical Group](https://github.com/sigmatactical-org)** for embedded CAN tooling in the Sigma stack. The crates.io package name **`dbc-rs`** is unchanged for semver continuity. Earlier standalone development and contributors are upstream lineage — see [`CONTRIBUTORS.md`](CONTRIBUTORS.md).
-
-[![CI](https://github.com/sigmatactical-org/dbc-rs/actions/workflows/dbc-rs.yml/badge.svg?branch=main)](https://github.com/sigmatactical-org/dbc-rs/actions/workflows/dbc-rs.yml)
+[![CI](https://github.com/sigmatactical-org/dbc-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/sigmatactical-org/dbc-rs/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/dbc-rs.svg)](https://crates.io/crates/dbc-rs)
 [![Documentation](https://docs.rs/dbc-rs/badge.svg)](https://docs.rs/dbc-rs)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 [![MSRV](https://img.shields.io/badge/MSRV-1.97.0-blue.svg)](https://www.rust-lang.org)
+
+A lightweight Rust library for seamlessly parsing and editing DBC (CAN Database) files, with robust support for encoding and decoding messages and signals.
+
+Maintained by **[Sigma Tactical Group](https://github.com/sigmatactical-org)** for embedded CAN tooling in the Sigma stack. The crates.io package name **`dbc-rs`** is unchanged for semver continuity. Earlier standalone development and contributors are upstream lineage — see [`CONTRIBUTORS.md`](CONTRIBUTORS.md).
 
 ## Features
 

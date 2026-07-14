@@ -5,9 +5,6 @@ resolver = "2"
 [workspace.dependencies]
 embedded-can = "0.4.1"
 
-[workspace.lints.rust]
-unsafe_code = "forbid"
-
 [workspace.lints.clippy]
 collapsible_if = "allow"
 uninlined_format_args = "allow"

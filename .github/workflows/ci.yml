@@ -9,7 +9,7 @@ on:
       - 'tests/**'
       - 'Cargo.toml'
       - 'build.rs'
-      - '.github/workflows/dbc-rs.yml'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [ main ]
     paths:
@@ -18,7 +18,7 @@ on:
       - 'tests/**'
       - 'Cargo.toml'
       - 'build.rs'
-      - '.github/workflows/dbc-rs.yml'
+      - '.github/workflows/ci.yml'
 
 env:
   CARGO_TERM_COLOR: always

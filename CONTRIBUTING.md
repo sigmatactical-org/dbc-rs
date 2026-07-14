@@ -152,7 +152,7 @@ Fixes #123
 
 The project uses GitHub Actions for continuous integration. Workflows automatically run on pushes and pull requests to the `main` branch.
 
-- **dbc-rs Library Workflow** (`.github/workflows/dbc-rs.yml`): Tests library with `std`/`no_std`, MSRV, linting, formatting, docs, and coverage
+- **dbc-rs Library Workflow** (`.github/workflows/ci.yml`): Tests library with `std`/`no_std`, MSRV, linting, formatting, docs, and coverage
 - **Benchmark Comparison** (`.github/workflows/benchmark-compare.yml`): Performance regression testing
 
 **Best Practices:**
