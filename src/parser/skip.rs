@@ -2,6 +2,7 @@ use super::Parser;
 use crate::Error;
 
 impl<'a> Parser<'a> {
+    /// Require and skip at least one space/tab.
     pub fn skip_whitespace(&mut self) -> crate::Result<&mut Self> {
         let input_len = self.input.len();
         if self.pos >= input_len {
@@ -20,6 +21,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Skip any run of whitespace including newlines.
     pub fn skip_newlines_and_spaces(&mut self) {
         let input_len = self.input.len();
         while self.pos < input_len {
@@ -44,6 +46,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Skip everything up to (and including) the next newline.
     pub fn skip_to_end_of_line(&mut self) {
         let input_len = self.input.len();
         while self.pos < input_len {

@@ -139,6 +139,7 @@ pub const SPECIFICATION: &str = include_str!("../SPECIFICATIONS.md");
 include!(concat!(env!("OUT_DIR"), "/limits.rs"));
 
 // DBC file format keywords
+// DBC section keywords (grammar tokens).
 pub(crate) const VERSION: &str = "VERSION";
 pub(crate) const CM_: &str = "CM_";
 pub(crate) const NS_: &str = "NS_";

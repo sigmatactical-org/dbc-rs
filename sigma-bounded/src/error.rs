@@ -10,4 +10,5 @@ pub enum Error {
     InvalidUtf8,
 }
 
+/// Result alias for bounded-collection operations.
 pub type Result<T> = core::result::Result<T, Error>;

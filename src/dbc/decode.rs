@@ -1,3 +1,6 @@
+mod switch_values;
+pub(crate) use switch_values::SwitchValues;
+
 use crate::{Dbc, Error, MAX_SIGNALS_PER_MESSAGE, Message, Result, compat::Vec};
 #[cfg(feature = "embedded-can")]
 use embedded_can::{Frame, Id};
@@ -93,63 +96,6 @@ impl<'a> DecodedSignal<'a> {
 /// Maximum number of multiplexer switches in a single message.
 /// Most CAN messages have 0-2 switches; 8 is generous.
 const MAX_SWITCHES: usize = 8;
-
-/// Pre-allocated buffer for switch values during decode.
-/// Uses fixed-size arrays to avoid heap allocation.
-struct SwitchValues<'a> {
-    /// Switch names (references to signal names, valid for decode lifetime)
-    names: [Option<&'a str>; MAX_SWITCHES],
-    /// Switch values corresponding to each name
-    values: [u64; MAX_SWITCHES],
-    /// Number of switches stored.
-    count: usize,
-}
-
-impl<'a> SwitchValues<'a> {
-    #[inline]
-    const fn new() -> Self {
-        Self {
-            names: [None; MAX_SWITCHES],
-            values: [0; MAX_SWITCHES],
-            count: 0,
-        }
-    }
-
-    /// Store a switch value. Returns Err if capacity exceeded.
-    #[inline]
-    fn push(&mut self, name: &'a str, value: u64) -> Result<()> {
-        if self.count >= MAX_SWITCHES {
-            return Err(Error::Decoding(Error::MESSAGE_TOO_MANY_SIGNALS));
-        }
-        let idx = self.count;
-        self.names[idx] = Some(name);
-        self.values[idx] = value;
-        self.count += 1;
-        Ok(())
-    }
-
-    /// Find switch value by name. O(n) where n is number of switches (typically 1-2).
-    #[inline]
-    fn get_by_name(&self, name: &str) -> Option<u64> {
-        for i in 0..self.count {
-            if self.names[i] == Some(name) {
-                return Some(self.values[i]);
-            }
-        }
-        None
-    }
-
-    /// Check if any switch has the given value.
-    #[inline]
-    fn any_has_value(&self, target: u64) -> bool {
-        for i in 0..self.count {
-            if self.values[i] == target && self.names[i].is_some() {
-                return true;
-            }
-        }
-        false
-    }
-}
 
 /// Decoding functionality for DBC structures
 impl Dbc {

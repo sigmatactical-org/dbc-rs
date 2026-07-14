@@ -2,6 +2,7 @@ use super::Parser;
 use crate::Error;
 
 impl<'a> Parser<'a> {
+    /// Require the exact byte pattern next in the input.
     pub fn expect(&mut self, expected: &[u8]) -> crate::Result<&mut Self> {
         if expected.is_empty() {
             return Ok(self);

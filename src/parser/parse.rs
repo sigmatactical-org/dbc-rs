@@ -3,6 +3,7 @@ use crate::Error;
 use core::str::from_utf8;
 
 impl<'a> Parser<'a> {
+    /// Parse an unsigned 8-bit integer.
     pub fn parse_u8(&mut self) -> crate::Result<u8> {
         let start_pos = self.pos;
         let start_line = self.line;
@@ -34,6 +35,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    /// Parse an unsigned 32-bit integer.
     pub fn parse_u32(&mut self) -> crate::Result<u32> {
         let start_pos = self.pos;
         let start_line = self.line;
@@ -97,6 +99,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    /// Parse a signed 64-bit integer.
     pub fn parse_i64(&mut self) -> crate::Result<i64> {
         let start_pos = self.pos;
         let start_line = self.line;
@@ -142,6 +145,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    /// Parse a floating-point number (integer forms accepted).
     pub fn parse_f64(&mut self) -> crate::Result<f64> {
         let start_pos = self.pos;
         let start_line = self.line;
@@ -199,6 +203,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    /// Parse a C-style identifier.
     pub fn parse_identifier(&mut self) -> crate::Result<&'a str> {
         let start_pos = self.pos;
         let start_line = self.line;

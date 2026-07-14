@@ -26,6 +26,9 @@
 //! }
 //! ```
 
+mod fast_dbc_inner;
+pub(crate) use fast_dbc_inner::FastDbcInner;
+
 mod decode;
 mod hasher;
 
@@ -57,22 +60,6 @@ const MAX_STANDARD_ID: usize = 2048;
 #[derive(Clone)]
 pub struct FastDbc {
     inner: Arc<FastDbcInner>,
-}
-
-struct FastDbcInner {
-    /// The underlying DBC
-    dbc: Dbc,
-    /// Direct lookup table for standard CAN IDs (0-2047)
-    /// Value is index into decode_plans, or usize::MAX if not present
-    standard_ids: Box<[usize; MAX_STANDARD_ID]>,
-    /// Hash map for extended CAN IDs and IDs >= 2048
-    extended_ids: FxHashMap<u32, usize>,
-    /// Pre-computed decode plans for each message
-    decode_plans: Vec<DecodePlan>,
-    /// Maximum signals in any single message
-    max_signals: usize,
-    /// Total signal count across all messages
-    total_signals: usize,
 }
 
 impl std::fmt::Debug for FastDbc {

@@ -2,6 +2,7 @@ use super::{Message, Signals};
 use crate::compat::{Comment, Name};
 
 impl Message {
+    /// Message from validated parts.
     pub(crate) fn new(
         id: u32,
         name: Name,

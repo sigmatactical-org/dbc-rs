@@ -3,6 +3,7 @@ use crate::{Error, MAX_NAME_SIZE, MAX_NODES, Result, compat::String, error::chec
 
 impl Nodes {
     // Shared validation function
+    /// Reject duplicate names and over-capacity node lists.
     pub(crate) fn validate(nodes: &[String<{ MAX_NAME_SIZE }>]) -> Result<()> {
         // Check for too many nodes (DoS protection)
         if let Some(err) = check_max_limit(

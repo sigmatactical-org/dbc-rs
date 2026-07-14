@@ -2,6 +2,7 @@ use super::{ExtendedMultiplexing, ValueRanges};
 use crate::compat::Name;
 
 impl ExtendedMultiplexing {
+    /// Extended-multiplexing entry from validated parts.
     pub(crate) fn new(
         message_id: u32,
         signal_name: Name,

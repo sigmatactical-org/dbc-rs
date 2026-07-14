@@ -8,7 +8,7 @@ use std::hash::{BuildHasherDefault, Hasher};
 /// Uses multiply-xor which is much faster than SipHash for small integer keys.
 /// Not cryptographically secure, but perfect for internal hash tables.
 #[derive(Default)]
-pub(super) struct FxHasher(u64);
+pub(crate) struct FxHasher(u64);
 
 impl Hasher for FxHasher {
     #[inline(always)]

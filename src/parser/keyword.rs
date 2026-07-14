@@ -56,6 +56,7 @@ const KEYWORDS_N: &[&str] = &["NS_DESC_", "NS_"];
 const KEYWORDS_F: &[&str] = &["FILTER"];
 
 impl<'a> Parser<'a> {
+    /// Look ahead to the next section keyword without consuming it.
     pub fn peek_next_keyword(&mut self) -> crate::Result<&'a str> {
         // Skip newlines and spaces to find the next keyword
         self.skip_newlines_and_spaces();

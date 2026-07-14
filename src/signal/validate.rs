@@ -2,6 +2,7 @@ use super::Signal;
 use crate::{Error, Result};
 
 impl Signal {
+    /// Validate signal name/length/range invariants.
     pub(crate) fn validate(name: &str, length: u16, min: f64, max: f64) -> Result<()> {
         if name.trim().is_empty() {
             return Err(Error::Validation(Error::SIGNAL_NAME_EMPTY));

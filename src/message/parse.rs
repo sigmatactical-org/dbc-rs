@@ -2,6 +2,7 @@ use super::{Message, Signals};
 use crate::{Error, MAX_NAME_SIZE, Parser, Result, Signal, compat};
 
 impl Message {
+    /// Parse one `BO_` message definition (signals already parsed).
     pub(crate) fn parse(parser: &mut Parser, signals: &[Signal]) -> Result<Self> {
         // Message parsing must always start with "BO_" keyword
         let line = parser.line();

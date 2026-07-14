@@ -2,6 +2,7 @@ use super::{ReceiverNames, Receivers};
 use crate::{Error, MAX_NODES, Parser, Result};
 
 impl Receivers {
+    /// Parse the receiver list that follows a signal definition.
     pub(crate) fn parse(parser: &mut Parser) -> Result<Self> {
         // Skip any leading spaces (but not newlines - newlines indicate end of line)
         // Skip whitespace (spaces and tabs, but not newlines) before checking for broadcast/newline

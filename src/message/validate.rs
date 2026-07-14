@@ -2,6 +2,7 @@ use super::Message;
 use crate::{ByteOrder, Error, MAX_SIGNALS_PER_MESSAGE, Result, Signal, error::check_max_limit};
 
 impl Message {
+    /// Validate message-level invariants (name, sender, DLC, id, signals).
     pub(crate) fn validate(
         id: u32,
         name: &str,
@@ -108,6 +109,7 @@ impl Message {
         Ok(())
     }
 
+    /// The inclusive bit span a signal occupies, honouring byte order.
     pub(crate) fn bit_range(start_bit: u16, length: u16, byte_order: ByteOrder) -> (u16, u16) {
         match byte_order {
             ByteOrder::LittleEndian => {

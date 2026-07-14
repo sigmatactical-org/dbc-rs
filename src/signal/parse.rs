@@ -143,6 +143,7 @@ impl Signal {
         Ok(unit)
     }
 
+    /// Parse one `SG_` signal definition.
     pub(crate) fn parse(parser: &mut Parser) -> Result<Self> {
         // Signal parsing must always start with "SG_" keyword
         parser.expect_keyword_then_skip(crate::SG_.as_bytes(), "Expected SG_ keyword")?;

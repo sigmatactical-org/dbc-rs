@@ -6,7 +6,7 @@ use crate::{ByteOrder, Signal};
 ///
 /// Packed for cache efficiency (fits in a single cache line per signal).
 #[derive(Clone, Copy)]
-pub(super) struct SignalDecode {
+pub(crate) struct SignalDecode {
     /// Starting byte index in payload
     pub byte_start: u8,
     /// Bit offset within starting byte (0-7)
@@ -22,8 +22,11 @@ pub(super) struct SignalDecode {
 }
 
 impl SignalDecode {
+    /// Signal is unsigned.
     pub const FLAG_UNSIGNED: u8 = 0b0001;
+    /// Signal is little-endian (Intel).
     pub const FLAG_LITTLE_ENDIAN: u8 = 0b0010;
+    /// Factor 1 / offset 0 — raw equals physical.
     pub const FLAG_IDENTITY: u8 = 0b0100;
 
     #[inline(always)]
@@ -70,7 +73,7 @@ impl SignalDecode {
 }
 
 /// Pre-computed decode plan for a message.
-pub(super) struct DecodePlan {
+pub(crate) struct DecodePlan {
     /// Message index in the original Dbc
     pub message_index: usize,
     /// Minimum bytes required to decode all signals

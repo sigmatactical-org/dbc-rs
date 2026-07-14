@@ -2,10 +2,12 @@ use super::{ReceiverNames, Receivers};
 use crate::compat::Name;
 
 impl Receivers {
+    /// Receivers set to `Vector__XXX` (none).
     pub(crate) fn new_none() -> Self {
         Receivers::None
     }
 
+    /// Receivers from an explicit node-name list.
     pub(crate) fn new_nodes(nodes: ReceiverNames) -> Self {
         // Validation should have been done prior (by builder or parse)
         Receivers::Nodes(nodes)

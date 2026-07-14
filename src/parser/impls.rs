@@ -2,6 +2,7 @@ use super::Parser;
 use crate::Error;
 
 impl<'a> Parser<'a> {
+    /// Parser over raw DBC bytes (validates UTF-8 lazily).
     pub fn new(input: &'a [u8]) -> crate::Result<Self> {
         if input.is_empty() {
             return Err(Error::unexpected_eof());

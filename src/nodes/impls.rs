@@ -1,6 +1,7 @@
 use super::{InnerNodes, Node, Nodes};
 
 impl Nodes {
+    /// Node set from parsed names.
     pub(crate) fn new(nodes: InnerNodes) -> Self {
         // Validation should have been done prior (by builder)
         Self { nodes }

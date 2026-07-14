@@ -1,6 +1,7 @@
 use super::Parser;
 
 impl<'a> Parser<'a> {
+    /// Consume bytes up to the closing quote, bounded by `max_len`.
     pub fn take_until_quote(
         &mut self,
         c_identifier: bool,
