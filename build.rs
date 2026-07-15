@@ -212,6 +212,36 @@ pub const MAX_ATTRIBUTE_ENUM_VALUES: usize = {attr_enums};
         ));
     }
 
+    // Limit-dependent error messages, so errors report the configured limit
+    // instead of a stale hardcoded number. Always emitted (the attribute
+    // messages fall back to the defaults when the feature is off — they are
+    // unreachable then, but the lang module still references them).
+    let attr_defs = max_attribute_definitions.unwrap_or(32);
+    let attr_vals = max_attribute_values.unwrap_or(16);
+    let attr_enums = max_attribute_enum_values.unwrap_or(64);
+    let max_receivers = max_nodes - 1;
+    limits_content.push_str(&format!(
+        r#"#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_NODES_TOO_MANY: &str = "Too many nodes: maximum allowed is {max_nodes} (build-time DBC_MAX_NODES)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_MESSAGES_TOO_MANY: &str = "Too many messages: maximum allowed is {max_messages} (build-time DBC_MAX_MESSAGES)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_MESSAGE_TOO_MANY_SIGNALS: &str = "Too many signals: maximum allowed is {max_signals} per message (build-time DBC_MAX_SIGNALS_PER_MESSAGE)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_SIGNAL_RECEIVERS_TOO_MANY: &str = "Too many receiver nodes: maximum allowed is {max_receivers} per signal (build-time DBC_MAX_NODES - 1)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_EXTENDED_MULTIPLEXING_TOO_MANY: &str = "Too many extended multiplexing entries: maximum allowed is {max_extended_multiplexing} per DBC file (build-time DBC_MAX_EXTENDED_MULTIPLEXING)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_VALUE_DESCRIPTIONS_TOO_MANY: &str = "Too many value descriptions: maximum allowed is {max_value_descriptions} (build-time DBC_MAX_VALUE_DESCRIPTIONS)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_ATTRIBUTE_DEFINITIONS_TOO_MANY: &str = "Too many attribute definitions: maximum allowed is {attr_defs} per DBC file (build-time DBC_MAX_ATTRIBUTE_DEFINITIONS)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_ATTRIBUTE_VALUES_TOO_MANY: &str = "Too many attribute values: maximum allowed is {attr_vals} per DBC file (build-time DBC_MAX_ATTRIBUTE_VALUES)";
+#[allow(dead_code)]
+pub(crate) const LIMIT_MSG_ATTRIBUTE_ENUM_VALUES_TOO_MANY: &str = "Too many enum values in attribute definition: maximum allowed is {attr_enums} (build-time DBC_MAX_ATTRIBUTE_ENUM_VALUES)";
+"#,
+    ));
+
     std::fs::write(&dest_path, limits_content).unwrap();
 
     // Rebuild if the environment variables change

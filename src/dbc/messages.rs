@@ -23,7 +23,7 @@ impl Messages {
         if let Some(err) = crate::error::check_max_limit(
             messages.len(),
             MAX_MESSAGES,
-            Error::message(Error::NODES_TOO_MANY),
+            Error::message(Error::MESSAGES_TOO_MANY),
         ) {
             return Err(err);
         }
@@ -36,7 +36,7 @@ impl Messages {
         if let Some(err) = crate::error::check_max_limit(
             messages.len(),
             MAX_MESSAGES,
-            Error::message(Error::NODES_TOO_MANY),
+            Error::message(Error::MESSAGES_TOO_MANY),
         ) {
             return Err(err);
         }

@@ -522,7 +522,7 @@ impl Dbc {
 
                     messages_buffer
                         .push(message)
-                        .map_err(|_| parser.err_message(Error::NODES_TOO_MANY))?;
+                        .map_err(|_| parser.err_message(Error::MESSAGES_TOO_MANY))?;
                     message_count_actual += 1;
                     continue;
                 }

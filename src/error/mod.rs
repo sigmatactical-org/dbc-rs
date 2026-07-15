@@ -119,6 +119,7 @@ impl Error {
     // Validation and decoding error constants
     pub const NODES_DUPLICATE_NAME: &'static str = lang::NODES_DUPLICATE_NAME;
     pub const NODES_TOO_MANY: &'static str = lang::NODES_TOO_MANY;
+    pub const MESSAGES_TOO_MANY: &'static str = lang::MESSAGES_TOO_MANY;
     pub const DUPLICATE_MESSAGE_ID: &'static str = lang::DUPLICATE_MESSAGE_ID;
     pub const SENDER_NOT_IN_NODES: &'static str = lang::SENDER_NOT_IN_NODES;
     pub const INVALID_RANGE: &'static str = lang::INVALID_RANGE;
