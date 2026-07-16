@@ -126,10 +126,12 @@ mod std {
         assert_eq!(dbc.messages().len(), 2);
 
         let engine_msg = dbc.messages().iter().find(|m| m.id() == 416).unwrap();
+        assert!(engine_msg.is_extended());
         assert_eq!(engine_msg.name(), "EngineData");
         assert_eq!(engine_msg.signals().len(), 2);
 
         let trans_msg = dbc.messages().iter().find(|m| m.id() == 688).unwrap();
+        assert!(trans_msg.is_extended());
         assert_eq!(trans_msg.name(), "TransmissionData");
         assert_eq!(trans_msg.signals().len(), 2);
 
@@ -141,6 +143,22 @@ mod std {
         let clutch = trans_msg.signals().find("Clutch").unwrap();
         assert_eq!(clutch.length(), 1);
         assert_eq!(clutch.start_bit(), 4);
+    }
+
+    #[test]
+    fn test_store_extended_ids_dbc() {
+        let content =
+            read_to_string("tests/data/extended_ids.dbc").expect("Failed to read extended_ids.dbc");
+        let dbc = Dbc::parse(&content).expect("Failed to parse extended_ids.dbc");
+
+        let stored = dbc.to_dbc_string();
+        let dbc = Dbc::parse(&stored).expect("Round-trip parse of extended_ids.dbc should succeed");
+
+        let engine_msg = dbc.messages().iter().find(|m| m.id() == 416).unwrap();
+        assert!(engine_msg.is_extended());
+
+        let trans_msg = dbc.messages().iter().find(|m| m.id() == 688).unwrap();
+        assert!(trans_msg.is_extended());
     }
 
     #[test]
