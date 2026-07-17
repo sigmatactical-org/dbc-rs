@@ -218,6 +218,34 @@ impl FastDbc {
         Some(self.decode_with_plan(plan, data, out))
     }
 
+    /// Decode a message by CAN ID, yielding `(name, physical value)` pairs.
+    ///
+    /// This is the ergonomic counterpart of [`decode_into`](Self::decode_into)
+    /// for callers that want signal names alongside values: one message
+    /// lookup, no output buffer to manage, and no allocation — signals are
+    /// decoded lazily as the iterator is advanced, in DBC declaration order
+    /// (the same order `decode_into` fills its buffer).
+    ///
+    /// Takes `is_extended` like [`Dbc::decode`], so a receive loop can pass
+    /// the frame's IDE flag straight through.
+    ///
+    /// # Returns
+    /// `None` if the message is not found or the payload is too short.
+    #[inline]
+    pub fn decode<'a>(
+        &'a self,
+        id: u32,
+        data: &'a [u8],
+        is_extended: bool,
+    ) -> Option<impl Iterator<Item = (&'a str, f64)> + 'a> {
+        let plan_idx = if is_extended {
+            self.get_plan_index_extended(id)
+        } else {
+            self.get_plan_index(id)
+        };
+        self.decode_named_with_plan(plan_idx?, data)
+    }
+
     /// Decode raw values by standard CAN ID.
     #[inline]
     pub fn decode_raw_into(&self, id: u32, data: &[u8], out: &mut [i64]) -> Option<usize> {
@@ -235,24 +263,53 @@ impl FastDbc {
     // Internal Decode Implementation
     // ========================================================================
 
+    /// Decode `(name, value)` pairs using a pre-computed plan.
+    #[inline]
+    fn decode_named_with_plan<'a>(
+        &'a self,
+        plan_idx: usize,
+        data: &'a [u8],
+    ) -> Option<impl Iterator<Item = (&'a str, f64)> + 'a> {
+        let plan = &self.inner.decode_plans[plan_idx];
+
+        if data.len() < plan.min_bytes as usize {
+            return None;
+        }
+
+        let message = self.inner.dbc.messages().at(plan.message_index)?;
+        Some(
+            message
+                .signals()
+                .iter()
+                .zip(plan.signals.iter())
+                .map(move |(signal, sig)| (signal.name(), self.decode_physical(*sig, data))),
+        )
+    }
+
     /// Decode using pre-computed plan.
     #[inline(always)]
     fn decode_with_plan(&self, plan: &DecodePlan, data: &[u8], out: &mut [f64]) -> usize {
         let mut count = 0;
         for (out_val, sig) in out.iter_mut().zip(plan.signals.iter()) {
-            // Compute the physical value from the correct integer domain: a
-            // 64-bit unsigned value with the MSB set must not be treated as a
-            // negative i64 (mirrors `Signal::decode_raw`).
-            let raw_bits = self.extract_bits(*sig, data);
-            let raw = if sig.is_unsigned() {
-                raw_bits as f64
-            } else {
-                Self::sign_extend(raw_bits, sig.length as usize) as f64
-            };
-            *out_val = self.apply_scaling(*sig, raw);
+            *out_val = self.decode_physical(*sig, data);
             count += 1;
         }
         count
+    }
+
+    /// Decode a signal's physical value from its pre-computed plan.
+    #[inline(always)]
+    fn decode_physical(&self, sig: SignalDecode, data: &[u8]) -> f64 {
+        // Compute the physical value from the correct integer domain: a
+        // 64-bit unsigned value with the MSB set must not be treated as a
+        // negative i64 (mirrors `Signal::decode_raw`).
+        let raw_bits = self.extract_bits(sig, data);
+        let raw = if sig.is_unsigned() {
+            raw_bits as f64
+        } else {
+            Self::sign_extend(raw_bits, sig.length as usize) as f64
+        };
+        self.apply_scaling(sig, raw)
     }
 
     /// Decode raw values using pre-computed plan.
@@ -427,6 +484,56 @@ BO_ 256 Engine : 8 ECM
 
         let msg = fast.get(256).unwrap();
         assert_eq!(msg.name(), "Engine");
+    }
+
+    #[test]
+    fn test_fast_dbc_decode_named() {
+        let dbc = Dbc::parse(
+            r#"VERSION "1.0"
+
+BU_: ECM
+
+BO_ 256 Engine : 8 ECM
+ SG_ RPM : 0|16@1+ (0.25,0) [0|8000] "rpm" *
+ SG_ Temp : 16|8@1- (1,-40) [-40|215] "C" *
+"#,
+        )
+        .unwrap();
+
+        let fast = FastDbc::new(dbc);
+
+        // RPM = 2000 (raw 8000), Temp = 50°C (raw 90)
+        let payload = [0x40, 0x1F, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00];
+        let pairs: Vec<(&str, f64)> = fast.decode(256, &payload, false).unwrap().collect();
+        assert_eq!(pairs, vec![("RPM", 2000.0), ("Temp", 50.0)]);
+
+        // Unknown ID and too-short payload both yield None.
+        assert!(fast.decode(512, &payload, false).is_none());
+        assert!(fast.decode(256, &[0u8; 1], false).is_none());
+    }
+
+    #[test]
+    fn test_fast_dbc_decode_named_extended() {
+        // 0x80000100 = extended flag | ID 256
+        let dbc = Dbc::parse(
+            r#"VERSION "1.0"
+
+BU_: ECM
+
+BO_ 2147483904 Engine : 8 ECM
+ SG_ RPM : 0|16@1+ (0.25,0) [0|8000] "rpm" *
+"#,
+        )
+        .unwrap();
+
+        let fast = FastDbc::new(dbc);
+
+        let payload = [0x40, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+        let pairs: Vec<(&str, f64)> = fast.decode(256, &payload, true).unwrap().collect();
+        assert_eq!(pairs, vec![("RPM", 2000.0)]);
+
+        // The bare 29-bit ID is not a standard ID.
+        assert!(fast.decode(256, &payload, false).is_none());
     }
 
     #[test]
