@@ -240,7 +240,15 @@ impl FastDbc {
     fn decode_with_plan(&self, plan: &DecodePlan, data: &[u8], out: &mut [f64]) -> usize {
         let mut count = 0;
         for (out_val, sig) in out.iter_mut().zip(plan.signals.iter()) {
-            let raw = self.extract_raw(*sig, data);
+            // Compute the physical value from the correct integer domain: a
+            // 64-bit unsigned value with the MSB set must not be treated as a
+            // negative i64 (mirrors `Signal::decode_raw`).
+            let raw_bits = self.extract_bits(*sig, data);
+            let raw = if sig.is_unsigned() {
+                raw_bits as f64
+            } else {
+                Self::sign_extend(raw_bits, sig.length as usize) as f64
+            };
             *out_val = self.apply_scaling(*sig, raw);
             count += 1;
         }
@@ -258,9 +266,9 @@ impl FastDbc {
         count
     }
 
-    /// Extract raw signed value from data.
+    /// Extract the raw bit pattern for a signal.
     #[inline(always)]
-    fn extract_raw(&self, sig: SignalDecode, data: &[u8]) -> i64 {
+    fn extract_bits(&self, sig: SignalDecode, data: &[u8]) -> u64 {
         let byte_order = if sig.is_little_endian() {
             ByteOrder::LittleEndian
         } else {
@@ -268,7 +276,13 @@ impl FastDbc {
         };
 
         let start_bit = sig.byte_start as usize * 8 + sig.bit_offset as usize;
-        let raw_bits = byte_order.extract_bits(data, start_bit, sig.length as usize);
+        byte_order.extract_bits(data, start_bit, sig.length as usize)
+    }
+
+    /// Extract raw signed value from data.
+    #[inline(always)]
+    fn extract_raw(&self, sig: SignalDecode, data: &[u8]) -> i64 {
+        let raw_bits = self.extract_bits(sig, data);
 
         if sig.is_unsigned() {
             raw_bits as i64
@@ -279,11 +293,11 @@ impl FastDbc {
 
     /// Apply factor and offset scaling.
     #[inline(always)]
-    fn apply_scaling(&self, sig: SignalDecode, raw: i64) -> f64 {
+    fn apply_scaling(&self, sig: SignalDecode, raw: f64) -> f64 {
         if sig.is_identity() {
-            raw as f64
+            raw
         } else {
-            (raw as f64) * sig.factor + sig.offset
+            raw * sig.factor + sig.offset
         }
     }
 
@@ -413,6 +427,44 @@ BO_ 256 Engine : 8 ECM
 
         let msg = fast.get(256).unwrap();
         assert_eq!(msg.name(), "Engine");
+    }
+
+    #[test]
+    fn test_fast_dbc_unsigned_64bit_msb_not_negative() {
+        // A 64-bit unsigned value with the MSB set must not be treated as a
+        // negative i64 when computing the physical value. Mirrors
+        // `Signal::decode_raw` (test_decode_unsigned_64bit_physical_value);
+        // regression test for the fast path funnelling raw values through i64.
+        let dbc = Dbc::parse(
+            r#"VERSION "1.0"
+
+BU_: ECM
+
+BO_ 256 Wide : 8 ECM
+ SG_ Serial : 0|64@1+ (1,0) [0|1] "" *
+
+BO_ 257 WideSigned : 8 ECM
+ SG_ Signed : 0|64@1- (1,0) [-1|1] "" *
+"#,
+        )
+        .unwrap();
+
+        let fast = FastDbc::new(dbc);
+        let mut values = vec![0.0f64; fast.max_signals()];
+
+        // MSB set: unsigned must stay in the u64 domain, signed must wrap.
+        let payload = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80];
+        assert_eq!(fast.decode_into(256, &payload, &mut values), Some(1));
+        assert_eq!(values[0], 9223372036854775808.0);
+        assert_eq!(fast.decode_into(257, &payload, &mut values), Some(1));
+        assert_eq!(values[0], -9223372036854775808.0);
+
+        // All bits set: unsigned is u64::MAX, signed is -1.
+        let payload = [0xFF; 8];
+        assert_eq!(fast.decode_into(256, &payload, &mut values), Some(1));
+        assert_eq!(values[0], u64::MAX as f64);
+        assert_eq!(fast.decode_into(257, &payload, &mut values), Some(1));
+        assert_eq!(values[0], -1.0);
     }
 
     #[test]
