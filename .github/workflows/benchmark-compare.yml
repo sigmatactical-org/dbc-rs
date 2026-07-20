@@ -46,7 +46,7 @@ jobs:
           path: criterion-main/
 
       - name: Checkout PR branch
-        run: git checkout ${{ github.head_ref || github.ref_name }}
+        run: git checkout ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Run benchmarks on PR branch
         continue-on-error: true
