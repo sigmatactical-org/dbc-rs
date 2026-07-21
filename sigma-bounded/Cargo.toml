@@ -2,7 +2,7 @@
 name = "sigma-bounded"
 version = "0.2.0"
 edition = "2024"
-rust-version = "1.97.0"
+rust-version = "1.97.1"
 license = "MIT OR Apache-2.0"
 authors = ["Sigma Tactical Group contributors <https://github.com/sigmatactical-org>"]
 description = "Bounded Vec, String, and map types abstracting alloc vs heapless"

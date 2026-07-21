@@ -22,7 +22,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_TOOLCHAIN: "1.97.0"
 
 jobs:
   test-std:
@@ -30,11 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
       - name: Build library with std feature
         run: cargo build --verbose
       - name: Run tests with std feature
@@ -45,11 +42,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
       - name: Test with alloc feature
         run: cargo test --verbose --no-default-features --features alloc
       - name: Build with alloc feature (release)
@@ -69,11 +64,9 @@ jobs:
       DBC_MAX_EXTENDED_MULTIPLEXING: 8
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
       - name: Test heapless feature (x86_64, release mode with reduced constants)
         run: cargo test --release --verbose --no-default-features --features heapless
       - name: Build heapless (x86_64, release)
@@ -88,11 +81,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@1.97.1
         with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: clippy
       - name: Install target standard library
         run: rustup target add thumbv7em-none-eabihf
@@ -112,11 +104,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@1.97.1
         with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: rustfmt
       - name: Check code formatting
         run: cargo fmt --all -- --check
@@ -126,11 +117,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
       - name: Check documentation
         env:
           RUSTDOCFLAGS: "-D warnings"
@@ -141,11 +130,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@v2
         with:
@@ -168,11 +155,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
       - name: Run benchmarks in test mode
         run: cargo test --benches --verbose
       # Run actual benchmarks and save baseline for comparison
@@ -183,7 +168,7 @@ jobs:
           BASELINE_NAME="ci-$(git rev-parse --short HEAD)"
           cargo bench --bench parse_bench --verbose -- --save-baseline "$BASELINE_NAME"
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: criterion-results-${{ github.ref_name == 'main' && 'main' || format('commit-{0}', github.sha) }}

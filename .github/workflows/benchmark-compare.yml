@@ -12,7 +12,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_TOOLCHAIN: "1.97.0"
 
 jobs:
   benchmark-compare:
@@ -20,14 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Need full history for baseline comparison
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        uses: dtolnay/rust-toolchain@1.97.1
 
       - name: Install critcmp
         run: cargo install critcmp --locked
@@ -39,7 +36,7 @@ jobs:
           mkdir -p criterion-main
 
       - name: Download main baseline artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: criterion-results-main
@@ -69,7 +66,7 @@ jobs:
           fi
 
       - name: Upload PR benchmark results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: criterion-results-pr-${{ github.head_ref || github.ref_name }}
